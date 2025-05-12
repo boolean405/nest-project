@@ -1,26 +1,32 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, ValidationPipe } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
 
+
+  constructor(private readonly usersService: UsersService) { }
+
   @Get()
-  findAll(@Query('name') name?: 'Bo Bo' | 'Boolean') { 
-    return [name]
+  findAll(@Query('role') role?: 'ADMIN' | 'MEMBER') {
+    return this.usersService.findAll(role)
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return { id }
+    return this.usersService.findOne(id)
   }
 
   @Post()
-  create(@Body() user: {}) {
-    return user
+  create(@Body(ValidationPipe) CreateUserDto: CreateUserDto) {
+    return this.usersService.create(CreateUserDto)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() userUpdate: {}) {
-    return { id, ...userUpdate }
+  update(@Param('id') id: string, @Body(ValidationPipe) UpdateUserDto: UpdateUserDto) {
+    return { id, ...UpdateUserDto }
   }
 
   @Delete(':id')
